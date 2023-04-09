@@ -5,7 +5,7 @@ import { bookTickets } from './src/bookingManager'
 import cors from 'cors'
 import { createEmptyCoach, createFilledCoach } from './src/utils'
 const app = express()
-const port = 3000
+const PORT = process.env.PORT || 3000
 
 const coach: Seat[][] = []
 for (let i = 0; i < 80; i++) {
@@ -21,8 +21,11 @@ const uri = process.env.DATABASE_URI || ''
 const client = new MongoClient(uri)
 
 try {
-    client.connect()
+    await client.connect()
     console.log('connected to db')
+    app.listen(PORT, () => {
+        console.log(`Example app listening on port ${PORT}`)
+    })
 } catch (err) {
     console.error('unable to connect to db')
 }
@@ -104,8 +107,4 @@ app.post('/randomfill', async (req, res) => {
     const updateDoc = { $set: autofilledCoach }
     await coaches.updateOne(filter, updateDoc)
     res.json({ status: 'success', coach: autofilledCoach }).status(200)
-})
-
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
 })
