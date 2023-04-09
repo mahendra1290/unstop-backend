@@ -20,15 +20,15 @@ dotenv.config()
 const uri = process.env.DATABASE_URI || ''
 const client = new MongoClient(uri)
 
-try {
-    await client.connect()
-    console.log('connected to db')
-    app.listen(PORT, () => {
-        console.log(`Example app listening on port ${PORT}`)
+client
+    .connect()
+    .then(() => {
+        console.log('connected to db')
+        app.listen(PORT, () => {
+            console.log(`Example app listening on port ${PORT}`)
+        })
     })
-} catch (err) {
-    console.error('unable to connect to db')
-}
+    .catch((err) => console.log('failed to connect to db'))
 
 const db = client.db('unstop')
 
