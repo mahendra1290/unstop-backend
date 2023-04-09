@@ -14,7 +14,7 @@ const createFilledCoach = (
     for (let i = 0; i < coach.totalSeats; i++) {
         const isReserved = Math.random() > fillingThresold
         if (isReserved) {
-            reservedSeats.push(i)
+            reservedSeats.push(i + 1)
         }
     }
     return { ...coach, reservedSeats }
@@ -29,9 +29,9 @@ const createSeatMap = (coach: Coach) => {
         if (i % coach.seatsPerRow === 0) {
             seatMap.push([])
         }
-        const isReserved = coach.reservedSeats.includes(i)
+        const isReserved = coach.reservedSeats.includes(i + 1)
         seatMap.at(-1)?.push({
-            number: i,
+            number: i + 1,
             status: isReserved ? 'reserved' : 'available',
         })
     }

@@ -131,7 +131,9 @@ const bookTickets = (
         return {
             coachSeats: {
                 ...coach,
-                reservedSeats: coachCopy.reservedSeats.concat(booked),
+                reservedSeats: coachCopy.reservedSeats
+                    .concat(booked)
+                    .sort((a, b) => a - b),
             },
             bookedSeats: booked,
         }
