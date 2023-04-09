@@ -2,39 +2,45 @@ import express, { json, urlencoded } from 'express'
 import { MongoClient, WithId } from 'mongodb'
 import * as dotenv from 'dotenv'
 import { bookTickets } from './src/bookingManager'
-import cors from 'cors'
+import cors, { CorsOptions } from 'cors'
 import { createEmptyCoach, createFilledCoach } from './src/utils'
 const app = express()
-const PORT = process.env.PORT || 3000
-
-const coach: Seat[][] = []
-for (let i = 0; i < 80; i++) {
-    if (i % 7 === 0) {
-        coach.push([])
-    }
-    coach.at(-1)?.push({ number: i + 1, status: 'available' })
-}
 
 dotenv.config()
 
-const uri = process.env.DATABASE_URI || ''
-const client = new MongoClient(uri)
+const PORT = process.env.PORT || 3000
+const DATABASE_URI = process.env.DATABASE_URI || ''
+const client = new MongoClient(DATABASE_URI)
 
 client
     .connect()
     .then(() => {
         console.log('connected to db')
         app.listen(PORT, () => {
-            console.log(`Example app listening on port ${PORT}`)
+            console.log(`listening on port ${PORT}`)
         })
     })
     .catch((err) => console.log('failed to connect to db'))
 
 const db = client.db('unstop')
-
 const coaches = db.collection('coaches')
 
-app.use(cors())
+const whitelist = [
+    'http://localhost:4200',
+    'https://unstop-reservation.netlify.app',
+]
+
+const corsOptions: CorsOptions = {
+    origin: function (origin, callback) {
+        if (origin && whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    },
+}
+
+app.use(cors(corsOptions))
 app.use(json())
 app.use(urlencoded({ extended: false }))
 
